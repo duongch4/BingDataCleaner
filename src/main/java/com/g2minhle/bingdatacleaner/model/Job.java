@@ -10,7 +10,7 @@ public class Job {
 
 	String _id;
 	String _userEmail;
-	String _documentID;
+	String _documentId;
 	JobStatus _status;
 	Long _totalWork;
 	Long _progress;
@@ -20,7 +20,7 @@ public class Job {
 	public static class JobbBuilder {
 		String _id;
 		String _userEmail;
-		String _documentID;
+		String _documentId;
 		JobStatus _status;
 		Long _totalWork;
 		Long _progress;
@@ -37,8 +37,8 @@ public class Job {
 			return this;
 		}
 
-		public JobbBuilder withDocumentID(String documentID) {
-			_documentID = documentID;
+		public JobbBuilder withDocumentId(String documentId) {
+			_documentId = documentId;
 			return this;
 		}
 
@@ -70,7 +70,7 @@ public class Job {
 		public JobbBuilder withJob(Job job) {
 			_id = job.getId();
 			_userEmail = job.getUserEmail();
-			_documentID = job.getDocumentID();
+			_documentId = job.getDocumentId();
 			_status = job.getStatus();
 			_totalWork = job.getTotalWork();
 			_progress = job.getProgress();
@@ -83,7 +83,7 @@ public class Job {
 			return new Job(
 					_id,
 					_userEmail,
-					_documentID,
+					_documentId,
 					_status,
 					_totalWork,
 					_progress,
@@ -95,7 +95,7 @@ public class Job {
 	public Job(
 			String id,
 			String userEmail,
-			String documentID,
+			String documentId,
 			JobStatus status,
 			Long totalWork,
 			Long progress,
@@ -103,7 +103,7 @@ public class Job {
 			Date doneTime) {
 		_id = id;
 		_userEmail = userEmail;
-		_documentID = documentID;
+		_documentId = documentId;
 		_status = status;
 		_totalWork = totalWork;
 		_progress = progress;
@@ -119,8 +119,8 @@ public class Job {
 		return _userEmail;
 	}
 
-	public String getDocumentID() {
-		return _documentID;
+	public String getDocumentId() {
+		return _documentId;
 	}
 
 	public JobStatus getStatus() {

@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>net.wasdev.wlp.sample</groupId>
-    <artifactId>JavaHelloWorldApp</artifactId>
+    <artifactId>BingDataCleaner</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -52,7 +52,7 @@
                     <artifactId>maven-war-plugin</artifactId>
                     <configuration>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
-                        <warName>JavaHelloWorldApp</warName>
+                        <warName>BingDataCleaner</warName>
                     </configuration>
                 </plugin>
                 <plugin>

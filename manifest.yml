@@ -1,7 +1,7 @@
 applications:
 - path: target/BingDataCleaner.war
-  memory: 256M
-  instances: 2
+  memory: 512M
+  instances: 1
   domain: mybluemix.net
   name: BingDataCleaner
   host: bingdatacleaner

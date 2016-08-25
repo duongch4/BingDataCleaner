@@ -10,7 +10,8 @@ public class Job {
 
 	String _id;
 	String _userEmail;
-	String _documentId;
+	String _sourceDocumentId;
+	String _destinationDocumentId;
 	JobStatus _status;
 	Long _totalWork;
 	Long _progress;
@@ -20,7 +21,8 @@ public class Job {
 	public static class JobbBuilder {
 		String _id;
 		String _userEmail;
-		String _documentId;
+		String _sourceDocumentId;
+		String _destinationDocumentId;
 		JobStatus _status;
 		Long _totalWork;
 		Long _progress;
@@ -37,8 +39,13 @@ public class Job {
 			return this;
 		}
 
-		public JobbBuilder withDocumentId(String documentId) {
-			_documentId = documentId;
+		public JobbBuilder withSourceDocumentId(String sourceDocumentId) {
+			_sourceDocumentId = sourceDocumentId;
+			return this;
+		}
+		
+		public JobbBuilder withDestincationDocumentId(String destinationDocumentId) {
+			_destinationDocumentId = destinationDocumentId;
 			return this;
 		}
 
@@ -70,7 +77,7 @@ public class Job {
 		public JobbBuilder withJob(Job job) {
 			_id = job.getId();
 			_userEmail = job.getUserEmail();
-			_documentId = job.getDocumentId();
+			_sourceDocumentId = job.getSourceDocumentId();
 			_status = job.getStatus();
 			_totalWork = job.getTotalWork();
 			_progress = job.getProgress();
@@ -83,7 +90,8 @@ public class Job {
 			return new Job(
 					_id,
 					_userEmail,
-					_documentId,
+					_sourceDocumentId,
+					_destinationDocumentId,
 					_status,
 					_totalWork,
 					_progress,
@@ -95,7 +103,8 @@ public class Job {
 	public Job(
 			String id,
 			String userEmail,
-			String documentId,
+			String sourceDocumentId,
+			String destinationDocumentId,
 			JobStatus status,
 			Long totalWork,
 			Long progress,
@@ -103,7 +112,8 @@ public class Job {
 			Date doneTime) {
 		_id = id;
 		_userEmail = userEmail;
-		_documentId = documentId;
+		_sourceDocumentId = sourceDocumentId;
+		_destinationDocumentId = destinationDocumentId;
 		_status = status;
 		_totalWork = totalWork;
 		_progress = progress;
@@ -119,9 +129,14 @@ public class Job {
 		return _userEmail;
 	}
 
-	public String getDocumentId() {
-		return _documentId;
+	public String getSourceDocumentId() {
+		return _sourceDocumentId;
 	}
+	
+	public String getDestinationDocumentId() {
+		return _destinationDocumentId;
+	}
+
 
 	public JobStatus getStatus() {
 		return _status;

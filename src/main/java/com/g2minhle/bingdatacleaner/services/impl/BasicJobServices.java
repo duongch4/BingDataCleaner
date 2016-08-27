@@ -20,26 +20,26 @@ import com.g2minhle.bingdatacleaner.services.RunningJobServices;
 public class BasicJobServices implements JobServices {
 
 	@Autowired
-	DocumentServices documentServices;
+	DocumentServices _documentServices;
 
 	@Autowired
-	DatabaseServices databaseServices;
+	DatabaseServices _databaseServices;
 
 	@Autowired
-	RunningJobServices runningJobServices;
+	RunningJobServices _runningJobServices;
 
 	@Override
 	public Job createJob(String userEmail, String documentUrl)
 			throws CannotAccessToDocumentException, DatabaseConnectivityException,
 			DocumentServiceConnectivityException, InvalidDocumentUrlException {
-		String sourceDocumentId = documentServices.getDocumentIdFromUrl(documentUrl);
+		String sourceDocumentId = _documentServices.getDocumentIdFromUrl(documentUrl);
 
 		// documentServices check accessibility by trying to read number of rows
-		Long totalWork = documentServices.getDocumentSize(sourceDocumentId);
+		Long totalWork = _documentServices.getDocumentSize(sourceDocumentId);
 		// documentServices create new file and assign owner ship to given a
 		// given user
 		String destinationDocumentId =
-				documentServices.createDestinationDocument(userEmail);
+				_documentServices.createDestinationDocument(userEmail);
 
 		Job newJob =
 				new Job.JobbBuilder()
@@ -52,15 +52,15 @@ public class BasicJobServices implements JobServices {
 						.withProgress(0L)
 						.withCreatedTime(new Date())
 						.build();
-		databaseServices.saveJob(newJob);
-		runningJobServices.startJob(newJob);
+		_databaseServices.saveJob(newJob);
+		_runningJobServices.startJob(newJob);
 		return newJob;
 	}
 
 	@Override
 	public Job getJob(String jobId)
 			throws DatabaseConnectivityException, JobNotFoundException {
-		return databaseServices.getJob(jobId);
+		return _databaseServices.getJob(jobId);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class BasicJobServices implements JobServices {
 		// TODO change to real patch not save full job to save data + compute
 		// power
 		Job newJob = new Job.JobbBuilder().withJob(job).withUserEmail(userEmail).build();
-		databaseServices.saveJob(newJob);
+		_databaseServices.saveJob(newJob);
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class BasicJobServices implements JobServices {
 		} catch (Exception e) {
 			throw new InvalidActionNameException();
 		}
-		runningJobServices.performActionOnJob(job, userAction);
+		_runningJobServices.performActionOnJob(job, userAction);
 	}
 
 }

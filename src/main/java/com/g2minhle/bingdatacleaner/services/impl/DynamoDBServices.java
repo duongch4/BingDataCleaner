@@ -13,9 +13,9 @@ import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 
 public class DynamoDBServices implements DatabaseServices {
 
-	static DynamoDB dynamoDB = new DynamoDB(new AmazonDynamoDBClient());
-	static Table table = dynamoDB.getTable("BingDataCleaner");
-	static ObjectMapper mapper = new ObjectMapper();
+	static ObjectMapper Mapper = new ObjectMapper();
+	static DynamoDB DynamoDBInstance = new DynamoDB(new AmazonDynamoDBClient());
+	static Table Table = DynamoDBInstance.getTable("BingDataCleaner");
 
 	@Override
 	public Job getJob(String jobId) throws DatabaseConnectivityException, JobNotFoundException{
@@ -23,11 +23,11 @@ public class DynamoDBServices implements DatabaseServices {
 			// TODO Auto-generated method stub
 			PrimaryKey key = new PrimaryKey();
 			key.addComponent("id", jobId);
-			Item item = table.getItem(key);
+			Item item = Table.getItem(key);
 			if (item == null){
 				throw new JobNotFoundException();
 			}
-			return mapper.readValue(item.toJSON(), Job.class);
+			return Mapper.readValue(item.toJSON(), Job.class);
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());
 		}
@@ -36,8 +36,8 @@ public class DynamoDBServices implements DatabaseServices {
 	@Override
 	public void saveJob(Job newJob) throws DatabaseConnectivityException {
 		try {
-			Item item = Item.fromJSON(mapper.writeValueAsString(newJob));
-			table.putItem(item);
+			Item item = Item.fromJSON(Mapper.writeValueAsString(newJob));
+			Table.putItem(item);
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());
 		}

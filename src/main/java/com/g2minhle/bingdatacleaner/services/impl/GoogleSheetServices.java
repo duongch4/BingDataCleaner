@@ -29,13 +29,13 @@ import com.google.api.services.sheets.v4.model.Request;
 
 public class GoogleSheetServices implements DocumentServices {
 
-	static Drive driveServices = null;
-	static Sheets sheetServices = null;
-	static List<String> scopes = new ArrayList<String>();
-	static final String parentFolderId = "0B65PxeIkFoQIZTFaMGRqX1JkUGs";
+	static Drive DriveServices = null;
+	static Sheets SheetServices = null;
+	static List<String> GoogleAPIScopes = new ArrayList<String>();
+	static final String PARENT_FOLDER_ID = "0B65PxeIkFoQIZTFaMGRqX1JkUGs";
 	static {
-		scopes.addAll(SheetsScopes.all());
-		scopes.addAll(DriveScopes.all());
+		GoogleAPIScopes.addAll(SheetsScopes.all());
+		GoogleAPIScopes.addAll(DriveScopes.all());
 	}
 
 	/** Global instance of the HTTP transport. */
@@ -43,7 +43,7 @@ public class GoogleSheetServices implements DocumentServices {
 	static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
 	public GoogleSheetServices() {
-		if (driveServices != null && sheetServices != null) {
+		if (DriveServices != null && SheetServices != null) {
 			return;
 		}
 
@@ -64,18 +64,18 @@ public class GoogleSheetServices implements DocumentServices {
 				GoogleSheetServices.class.getResourceAsStream("/client_secret.json");
 		GoogleCredential credential;
 		try {
-			credential = GoogleCredential.fromStream(in).createScoped(scopes);
+			credential = GoogleCredential.fromStream(in).createScoped(GoogleAPIScopes);
 		} catch (Exception e) {
 			// TODO add alert
 			e.printStackTrace();
 			return;
 		}
 
-		sheetServices =
+		SheetServices =
 				new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 						.setApplicationName(BingDataCleanerApplication.APPLICATION_NAME)
 						.build();
-		driveServices =
+		DriveServices =
 				new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 						.setApplicationName(BingDataCleanerApplication.APPLICATION_NAME)
 						.build();
@@ -92,18 +92,18 @@ public class GoogleSheetServices implements DocumentServices {
 			throws DocumentServiceConnectivityException {
 		File newSheet = new File();
 		newSheet.setMimeType("application/vnd.google-apps.spreadsheet");
-		newSheet.setParents(Arrays.asList(parentFolderId));
+		newSheet.setParents(Arrays.asList(PARENT_FOLDER_ID));
 		newSheet.setName("temp");
 		Permission userPermission =
 				new Permission().setType("user").setRole("writer")
 						.setEmailAddress(userEmail);
 		try {
-			newSheet = driveServices.files().create(newSheet).execute();
+			newSheet = DriveServices.files().create(newSheet).execute();
 			newSheet.setName(newSheet.getId());
 			File changedSheetName = new File();
 			changedSheetName.setName(newSheet.getId());
-			driveServices.files().update(newSheet.getId(), changedSheetName).execute();			
-			driveServices.permissions().create(newSheet.getId(), userPermission).execute();
+			DriveServices.files().update(newSheet.getId(), changedSheetName).execute();			
+			DriveServices.permissions().create(newSheet.getId(), userPermission).execute();
 		} catch (Exception e) {
 			throw new DocumentServiceConnectivityException(e.getMessage());
 		}

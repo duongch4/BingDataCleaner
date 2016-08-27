@@ -24,7 +24,7 @@ import com.g2minhle.bingdatacleaner.services.JobServices;
 public class JobController {
 
 	@Autowired
-	JobServices jobServices;
+	JobServices _jobServices;
 
 	private final static Logger LOGGER = Logger.getLogger(JobController.class.getName());
 
@@ -40,7 +40,7 @@ public class JobController {
 							"Request to create new job for %s with with %s",
 							userEmail,
 							documentUrl));
-			Job newJob = jobServices.createJob(userEmail, documentUrl);
+			Job newJob = _jobServices.createJob(userEmail, documentUrl);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return newJob;
 		} catch (CannotAccessToDocumentException e) {
@@ -65,7 +65,7 @@ public class JobController {
 			@PathVariable String jobId,
 			HttpServletResponse response) {
 		try {
-			return jobServices.getJob(jobId);
+			return _jobServices.getJob(jobId);
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {
@@ -84,7 +84,7 @@ public class JobController {
 			String userEmail,
 			HttpServletResponse response) {
 		try {
-			jobServices.updateJob(jobId, userEmail);
+			_jobServices.updateJob(jobId, userEmail);
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {
@@ -102,7 +102,7 @@ public class JobController {
 			String action,
 			HttpServletResponse response) {
 		try {
-			jobServices.performAnActionOnJob(jobId, action);
+			_jobServices.performAnActionOnJob(jobId, action);
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {

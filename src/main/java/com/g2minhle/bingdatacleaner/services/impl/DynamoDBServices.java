@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.g2minhle.bingdatacleaner.exception.DatabaseConnectivityException;
+import com.g2minhle.bingdatacleaner.exception.JobNotFoundException;
 import com.g2minhle.bingdatacleaner.model.Job;
 import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 
@@ -17,12 +18,15 @@ public class DynamoDBServices implements DatabaseServices {
 	static ObjectMapper mapper = new ObjectMapper();
 
 	@Override
-	public Job getJob(String jobId) throws DatabaseConnectivityException {
+	public Job getJob(String jobId) throws DatabaseConnectivityException, JobNotFoundException{
 		try {
 			// TODO Auto-generated method stub
 			PrimaryKey key = new PrimaryKey();
-			key.addComponent("jobId", jobId);
+			key.addComponent("id", jobId);
 			Item item = table.getItem(key);
+			if (item == null){
+				throw new JobNotFoundException();
+			}
 			return mapper.readValue(item.toJSON(), Job.class);
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());

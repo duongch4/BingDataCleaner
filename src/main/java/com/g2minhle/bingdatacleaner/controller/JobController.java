@@ -2,6 +2,7 @@ package com.g2minhle.bingdatacleaner.controller;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,13 +26,20 @@ public class JobController {
 	@Autowired
 	JobServices jobServices;
 
+	private final static Logger LOGGER = Logger.getLogger(JobController.class.getName());
+
 	@ResponseBody
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public Job createJob(
-			@PathVariable("userEmail") String userEmail,
-			@PathVariable("documentUrl") String documentUrl,
+			String userEmail,
+			String documentUrl,
 			HttpServletResponse response) {
 		try {
+			LOGGER.debug(
+					String.format(
+							"Request to create new job for %s with with %s",
+							userEmail,
+							documentUrl));
 			Job newJob = jobServices.createJob(userEmail, documentUrl);
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return newJob;
@@ -100,7 +108,7 @@ public class JobController {
 		} catch (DatabaseConnectivityException e) {
 			// TODO add warning
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-		} catch (InvalidActionNameException e){
+		} catch (InvalidActionNameException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (Exception e) {
 			// TODO add alert to this issue

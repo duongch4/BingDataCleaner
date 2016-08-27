@@ -2,6 +2,9 @@ package com.g2minhle.bingdatacleaner.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Job {
 
 	public enum JobStatus {
@@ -100,15 +103,25 @@ public class Job {
 		}
 	}
 
+	@JsonCreator
 	public Job(
+			@JsonProperty("id")
 			String id,
+			@JsonProperty("userEmail")
 			String userEmail,
+			@JsonProperty("sourceDocumentId")
 			String sourceDocumentId,
+			@JsonProperty("destinationDocumentId")
 			String destinationDocumentId,
+			@JsonProperty("status")
 			JobStatus status,
+			@JsonProperty("totalWork")
 			Long totalWork,
+			@JsonProperty("progress")
 			Long progress,
+			@JsonProperty("createdTime")
 			Date createdTime,
+			@JsonProperty("doneTime")
 			Date doneTime) {
 		_id = id;
 		_userEmail = userEmail;

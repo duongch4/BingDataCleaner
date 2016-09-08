@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import com.g2minhle.bingdatacleaner.BingDataCleanerApplication;
 import com.g2minhle.bingdatacleaner.exception.CannotAccessToDocumentException;
@@ -13,7 +17,6 @@ import com.g2minhle.bingdatacleaner.exception.DocumentServiceConnectivityExcepti
 import com.g2minhle.bingdatacleaner.exception.InvalidDocumentUrlException;
 import com.g2minhle.bingdatacleaner.services.DocumentServices;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -25,7 +28,12 @@ import com.google.api.services.drive.model.Permission;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.CellData;
+import com.google.api.services.sheets.v4.model.ExtendedValue;
+import com.google.api.services.sheets.v4.model.GridCoordinate;
 import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.RowData;
+import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 
 public class GoogleSheetServices implements DocumentServices {
 
@@ -38,11 +46,21 @@ public class GoogleSheetServices implements DocumentServices {
 		GoogleAPIScopes.addAll(DriveScopes.all());
 	}
 
+	private static GoogleSheetServices instance = null;
+
+	public static GoogleSheetServices getInstance() {
+		if (instance == null) {
+			instance = new GoogleSheetServices();
+		}
+		return instance;
+	}
+
+	
 	/** Global instance of the HTTP transport. */
 	static HttpTransport HTTP_TRANSPORT;
 	static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-	public GoogleSheetServices() {
+	private GoogleSheetServices() {
 		if (DriveServices != null && SheetServices != null) {
 			return;
 		}
@@ -84,7 +102,16 @@ public class GoogleSheetServices implements DocumentServices {
 	@Override
 	public Long getDocumentSize(String sourceDocumentId)
 			throws CannotAccessToDocumentException, DocumentServiceConnectivityException {
-		return 10L;
+		try {
+			Document doc =
+					Jsoup.connect("https://script.google.com/macros/s/AKfycbzhROusom6nLSsoAjj4tH9HBrTlEk0lDZSLEF2qi7uHBXJaS2w/exec?sheetId=" + sourceDocumentId)
+							.timeout(10000).ignoreHttpErrors(true)
+							.userAgent("Mozilla/5.0").get();						
+			return Long.parseLong(doc.select("body").html().toString());
+		} catch (Exception e) {
+			throw new DocumentServiceConnectivityException(e.getMessage());
+		}
+
 	}
 
 	@Override
@@ -102,8 +129,9 @@ public class GoogleSheetServices implements DocumentServices {
 			newSheet.setName(newSheet.getId());
 			File changedSheetName = new File();
 			changedSheetName.setName(newSheet.getId());
-			DriveServices.files().update(newSheet.getId(), changedSheetName).execute();			
-			DriveServices.permissions().create(newSheet.getId(), userPermission).execute();
+			DriveServices.files().update(newSheet.getId(), changedSheetName).execute();
+			DriveServices.permissions().create(newSheet.getId(), userPermission)
+					.execute();
 		} catch (Exception e) {
 			throw new DocumentServiceConnectivityException(e.getMessage());
 		}
@@ -113,8 +141,74 @@ public class GoogleSheetServices implements DocumentServices {
 	@Override
 	public String getDocumentIdFromUrl(String documentUrl)
 			throws InvalidDocumentUrlException {
-		// TODO Auto-generated method stub
-		return null;
+		documentUrl = documentUrl.substring("https://docs.google.com/spreadsheets/d/".length());
+		documentUrl.indexOf("/edit#gid");
+		documentUrl.substring(0, documentUrl.indexOf("/edit#gid"));		
+		return documentUrl;
+	}
+
+	public List<String> readFromDocument(String documentId, Long start, Long count)
+			throws DocumentServiceConnectivityException {
+		try {
+			List<String> result = new LinkedList<>();
+			String range = String.format("A%d:A%d", start + 1, start + count + 1);
+			List<List<Object>> values =
+					SheetServices.spreadsheets().values().get(documentId, range).execute()
+							.getValues();
+
+			for (List<Object> row : values) {
+				result.add(row.get(0).toString());
+			}
+			return result;
+		} catch (IOException e) {
+			throw new DocumentServiceConnectivityException(e.getMessage());
+		}
+	}
+
+	public void writeToDocument(
+			String documentId,
+			Long start,
+			List<String> dataEntries,
+			List<String> searchResults) throws DocumentServiceConnectivityException {
+		try {
+			List<Request> requests = new ArrayList<>();
+
+			for (int i = 0; i < dataEntries.size(); i++) {
+
+				List<CellData> values = new ArrayList<>();
+				values.add(
+						new CellData().setUserEnteredValue(
+								new ExtendedValue().setStringValue(dataEntries.get(i))));
+				values.add(
+						new CellData().setUserEnteredValue(
+								new ExtendedValue()
+										.setStringValue(searchResults.get(i))));
+
+				requests.add(
+						new Request()
+								.setUpdateCells(
+										new UpdateCellsRequest()
+												.setStart(
+														new GridCoordinate().setSheetId(0)
+																.setRowIndex(
+																		start.intValue() + i)
+																.setColumnIndex(0))
+												.setRows(
+														Arrays.asList(
+																new RowData().setValues(
+																		values)))
+												.setFields("userEnteredValue")));
+
+			}
+
+			BatchUpdateSpreadsheetRequest batchUpdateRequest =
+					new BatchUpdateSpreadsheetRequest().setRequests(requests);
+			SheetServices.spreadsheets().batchUpdate(documentId, batchUpdateRequest)
+					.execute();
+
+		} catch (IOException e) {
+			throw new DocumentServiceConnectivityException(e.getMessage());
+		}
 	}
 
 }

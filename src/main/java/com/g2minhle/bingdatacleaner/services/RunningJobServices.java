@@ -7,4 +7,6 @@ public interface RunningJobServices {
 	public void startJob(Job newJob);
 
 	public void performActionOnJob(Job job, UserAction action);
+	
+	public void removeJob(String jobId);
 }

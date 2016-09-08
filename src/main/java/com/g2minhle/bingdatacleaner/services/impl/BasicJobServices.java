@@ -27,6 +27,19 @@ public class BasicJobServices implements JobServices {
 
 	@Autowired
 	RunningJobServices _runningJobServices;
+	
+	private static BasicJobServices instance = null;
+
+	private BasicJobServices() {
+		// Exists only to defeat instantiation.
+	}
+
+	public static BasicJobServices getInstance() {
+		if (instance == null) {
+			instance = new BasicJobServices();
+		}
+		return instance;
+	}
 
 	@Override
 	public Job createJob(String userEmail, String documentUrl)
@@ -34,7 +47,6 @@ public class BasicJobServices implements JobServices {
 			DocumentServiceConnectivityException, InvalidDocumentUrlException {
 		String sourceDocumentId = _documentServices.getDocumentIdFromUrl(documentUrl);
 
-		// documentServices check accessibility by trying to read number of rows
 		Long totalWork = _documentServices.getDocumentSize(sourceDocumentId);
 		// documentServices create new file and assign owner ship to given a
 		// given user
@@ -67,8 +79,6 @@ public class BasicJobServices implements JobServices {
 	public void updateJob(String jobId, String userEmail)
 			throws JobNotFoundException, DatabaseConnectivityException {
 		Job job = this.getJob(jobId);
-		// TODO change to real patch not save full job to save data + compute
-		// power
 		Job newJob = new Job.JobbBuilder().withJob(job).withUserEmail(userEmail).build();
 		_databaseServices.saveJob(newJob);
 	}

@@ -15,10 +15,10 @@ import com.g2minhle.bingdatacleaner.services.impl.GoogleSheetServices;
 @Configuration
 public class DepedencyInjection {
 
-	public final static JobServices _basicJobServices = new BasicJobServices();
-	public final static DynamoDBServices _dynamoDBServices = new DynamoDBServices();
-	public final static DocumentServices _documentServices = new GoogleSheetServices();
-	public final static RunningJobServices _runningJobServices = new BasicRunningJobServices();
+	public final static JobServices _basicJobServices = BasicJobServices.getInstance();
+	public final static DynamoDBServices _dynamoDBServices = DynamoDBServices.getInstance();
+	public final static DocumentServices _documentServices = GoogleSheetServices.getInstance();
+	public final static RunningJobServices _runningJobServices = BasicRunningJobServices.getInstance();
 	@Bean
 	public JobServices jobServices() {
 		return _basicJobServices;

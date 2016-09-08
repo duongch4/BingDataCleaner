@@ -81,6 +81,7 @@ public class Job {
 			_id = job.getId();
 			_userEmail = job.getUserEmail();
 			_sourceDocumentId = job.getSourceDocumentId();
+			_destinationDocumentId = job.getDestinationDocumentId();
 			_status = job.getStatus();
 			_totalWork = job.getTotalWork();
 			_progress = job.getProgress();

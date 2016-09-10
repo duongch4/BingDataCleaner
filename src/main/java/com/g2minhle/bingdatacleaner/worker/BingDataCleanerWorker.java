@@ -12,8 +12,10 @@ import com.g2minhle.bingdatacleaner.model.Job;
 import com.g2minhle.bingdatacleaner.model.Job.JobStatus;
 import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 import com.g2minhle.bingdatacleaner.services.DocumentServices;
+import com.g2minhle.bingdatacleaner.services.EmailServices;
 import com.g2minhle.bingdatacleaner.services.RunningJobServices;
 import com.g2minhle.bingdatacleaner.services.impl.DynamoDBServices;
+import com.g2minhle.bingdatacleaner.services.impl.GmailServices;
 import com.g2minhle.bingdatacleaner.services.impl.GoogleSheetServices;
 
 public class BingDataCleanerWorker extends Thread {
@@ -23,6 +25,8 @@ public class BingDataCleanerWorker extends Thread {
 	DatabaseServices _databaseServices = DynamoDBServices.getInstance();
 
 	RunningJobServices _runningJobServices;
+	
+	EmailServices _emailServices = new GmailServices();
 
 	Job _job;
 	Boolean _keepRunning;
@@ -66,7 +70,7 @@ public class BingDataCleanerWorker extends Thread {
 
 			Long progress = _job.getProgress();
 			Long onePercent = _job.getTotalWork() / 100 + 1;
-			Long itemPerBatch = Long.max(10L, onePercent);
+			Long itemPerBatch = Long.min(20L, onePercent);
 
 			for (progress = _job.getProgress(); progress < _job.getTotalWork();) {
 				if (!_keepRunning)
@@ -79,6 +83,8 @@ public class BingDataCleanerWorker extends Thread {
 								progress,
 								itemPerBatch);
 				for (int i = 0; i < entries.size(); i++) {
+					if (!_keepRunning)
+						return;
 					searchResults.add(searchBing(entries.get(i)));
 				}
 
@@ -97,6 +103,7 @@ public class BingDataCleanerWorker extends Thread {
 							.withDoneTime(new Date()).build();
 			_databaseServices.saveJob(_job);
 			_runningJobServices.stopAndRemoveJob(_job.getId());
+			_emailServices.notifyDoneJobDone(_job);
 		} catch (Exception e) {
 
 		}

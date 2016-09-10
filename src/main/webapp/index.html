@@ -1,24 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Java Web Starter Application</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="style.css" />
+<title>Java Web Starter Application</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="style.css" />
+<!-- Latest compiled and minified CSS -->
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+	crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+	crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	crossorigin="anonymous"></script>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
 </head>
 <body>
-	<table>
-		<tr>
-			<td style='width: 30%;'><img class = "newappIcon" src='images/newapp-icon.png'>
-			</td>
-			<td>
-				<!-- The "Hello World!" message comes from /SimpleServlet -->
-				<h1 id = "message"></h1>
-				
-				<p class='description'></p> Thanks for creating a <span class="blue">Liberty for Java Starter Application</span>. To get started see the Start Coding guide under your app in your dashboard.
-			</td>
-		</tr>
-	</table>
-	<!-- Call SimpleServlet to get the "Hello World" message  -->
+	<div class="container">
+		<div id="div_SubmitJobForm">
+			<form action="/BingDataCleaner/jobs/" method="post">
+				<div class="form-group">
+					<label for="userEmail" class="control-label">
+						<h2>User email</h2>
+					</label>
+					<div>
+						<input class="form-control input-box" id="input_userEmail"
+							name="userEmail" placeholder="userEmail" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="documentUrl" class="control-label">
+						<h2>Document Url</h2>
+					</label>
+					<div>
+						<input class="form-control input-box" id="input_documentUrl"
+							name="documentUrl" placeholder="documentUrl" />
+					</div>
+				</div>
+				<div class="form-group">
+					<a id="a_SubmitJob" class="btn btn-primary xxl-button" href="#">Submit
+						job</a>
+				</div>
+			</form>
+		</div>
+		<div id="div_JobStatus">
+			<div class="row">
+				<div class="col-xs-12">
+					<div class="row">
+						<div class="col-xs-2">
+							<b>Job status</b>
+						</div>
+						<div class="col-xs-4" id="div_jobStatus">Submitted</div>
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="row">
+						<div class="col-xs-2">
+							<b>Job id</b>
+						</div>
+						<div class="col-xs-4" id="div_jobId"></div>
+					</div>
+				</div>
+				<div class="col-xs-12">
+					<div class="progress">
+						<div class="progress-bar" style="width: 0%;" id="div_progressBar">0%</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<script type="text/javascript" src="index.js"></script>
 </body>
 </html>

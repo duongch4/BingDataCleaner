@@ -65,7 +65,7 @@ public class DynamoDBServices implements DatabaseServices {
 	@Override
 	public List<Job> getJobs() throws DatabaseConnectivityException {
 		try {
-			List<Job> jobs = new LinkedList<>();
+			List<Job> jobs = new LinkedList<Job>();
 			ItemCollection<ScanOutcome> scanResults = Table.scan();
 			for (Item item : scanResults) {
 				jobs.add(Mapper.readValue(item.toJSON(), Job.class));

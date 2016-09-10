@@ -1,5 +1,6 @@
 package com.g2minhle.bingdatacleaner.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -78,8 +79,8 @@ public class GoogleSheetServices implements DocumentServices {
 			e.printStackTrace();
 			return;
 		}
-		InputStream in =
-				GoogleSheetServices.class.getResourceAsStream("/client_secret.json");
+		String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+		InputStream in = new ByteArrayInputStream(clientSecret.getBytes());
 		GoogleCredential credential;
 		try {
 			credential = GoogleCredential.fromStream(in).createScoped(GoogleAPIScopes);
@@ -142,8 +143,7 @@ public class GoogleSheetServices implements DocumentServices {
 	public String getDocumentIdFromUrl(String documentUrl)
 			throws InvalidDocumentUrlException {
 		documentUrl = documentUrl.substring("https://docs.google.com/spreadsheets/d/".length());
-		documentUrl.indexOf("/edit#gid");
-		documentUrl.substring(0, documentUrl.indexOf("/edit#gid"));		
+		documentUrl = documentUrl.substring(0, documentUrl.indexOf("/edit"));		
 		return documentUrl;
 	}
 

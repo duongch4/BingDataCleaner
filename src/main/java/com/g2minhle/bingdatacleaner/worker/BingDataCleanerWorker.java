@@ -72,7 +72,7 @@ public class BingDataCleanerWorker extends Thread {
 				if (!_keepRunning)
 					return;
 				itemPerBatch = Long.min(itemPerBatch, _job.getTotalWork() - progress);
-				searchResults = new LinkedList<>();
+				searchResults = new LinkedList<String>();
 				entries =
 						_documentServices.readFromDocument(
 								_job.getSourceDocumentId(),

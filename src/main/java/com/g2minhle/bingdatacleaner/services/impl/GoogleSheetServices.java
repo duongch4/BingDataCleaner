@@ -150,7 +150,7 @@ public class GoogleSheetServices implements DocumentServices {
 	public List<String> readFromDocument(String documentId, Long start, Long count)
 			throws DocumentServiceConnectivityException {
 		try {
-			List<String> result = new LinkedList<>();
+			List<String> result = new LinkedList<String>();
 			String range = String.format("A%d:A%d", start + 1, start + count + 1);
 			List<List<Object>> values =
 					SheetServices.spreadsheets().values().get(documentId, range).execute()
@@ -171,11 +171,11 @@ public class GoogleSheetServices implements DocumentServices {
 			List<String> dataEntries,
 			List<String> searchResults) throws DocumentServiceConnectivityException {
 		try {
-			List<Request> requests = new ArrayList<>();
+			List<Request> requests = new ArrayList<Request>();
 
 			for (int i = 0; i < dataEntries.size(); i++) {
 
-				List<CellData> values = new ArrayList<>();
+				List<CellData> values = new ArrayList<CellData>();
 				values.add(
 						new CellData().setUserEnteredValue(
 								new ExtendedValue().setStringValue(dataEntries.get(i))));

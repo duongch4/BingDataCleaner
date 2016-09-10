@@ -62,7 +62,7 @@ public class BingDataCleanerWorker extends Thread {
 					new Job.JobbBuilder().withJob(_job).withStatus(JobStatus.RUNNING)
 							.build();
 			List<String> entries;
-			List<String> searchResults = new LinkedList<>();
+			List<String> searchResults = new LinkedList<String>();
 
 			Long progress = _job.getProgress();
 			Long onePercent = _job.getTotalWork() / 100 + 1;

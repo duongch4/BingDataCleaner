@@ -30,8 +30,10 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.CellData;
+import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.ExtendedValue;
 import com.google.api.services.sheets.v4.model.GridCoordinate;
+import com.google.api.services.sheets.v4.model.InsertDimensionRequest;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.RowData;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
@@ -115,8 +117,23 @@ public class GoogleSheetServices implements DocumentServices {
 
 	}
 
+	private void extendSheetSize(File newSheet, Long totalWork) throws IOException{
+		BatchUpdateSpreadsheetRequest batchRequest = new BatchUpdateSpreadsheetRequest();
+		InsertDimensionRequest insertDimensionRequest = new InsertDimensionRequest();
+		DimensionRange range = new DimensionRange();
+		range.setDimension("ROWS");
+		range.setStartIndex(0);
+		range.setSheetId(0);
+		range.setEndIndex(totalWork.intValue());
+		Request request = new Request();
+		insertDimensionRequest.setRange(range);
+		request.setInsertDimension(insertDimensionRequest);
+		batchRequest.setRequests(Arrays.asList(request));			
+		SheetServices.spreadsheets().batchUpdate(newSheet.getId(), batchRequest).execute();
+	}
+	
 	@Override
-	public String createDestinationDocument(String userEmail)
+	public String createDestinationDocument(String userEmail, Long totalWork)
 			throws DocumentServiceConnectivityException {
 		File newSheet = new File();
 		newSheet.setMimeType("application/vnd.google-apps.spreadsheet");
@@ -133,6 +150,7 @@ public class GoogleSheetServices implements DocumentServices {
 			DriveServices.files().update(newSheet.getId(), changedSheetName).execute();
 			DriveServices.permissions().create(newSheet.getId(), userPermission)
 					.execute();
+			extendSheetSize(newSheet, totalWork);
 		} catch (Exception e) {
 			throw new DocumentServiceConnectivityException(e.getMessage());
 		}

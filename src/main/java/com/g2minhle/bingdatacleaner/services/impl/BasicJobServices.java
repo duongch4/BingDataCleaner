@@ -51,7 +51,7 @@ public class BasicJobServices implements JobServices {
 		// documentServices create new file and assign owner ship to given a
 		// given user
 		String destinationDocumentId =
-				_documentServices.createDestinationDocument(userEmail);
+				_documentServices.createDestinationDocument(userEmail, totalWork);
 
 		Job newJob =
 				new Job.JobbBuilder()

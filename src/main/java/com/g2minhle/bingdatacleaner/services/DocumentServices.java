@@ -11,7 +11,7 @@ public interface DocumentServices {
 	public Long getDocumentSize(String sourceDocumentId)
 			throws CannotAccessToDocumentException, DocumentServiceConnectivityException;
 
-	public String createDestinationDocument(String userEmail)
+	public String createDestinationDocument(String userEmail, Long totalWork)
 			throws DocumentServiceConnectivityException;
 
 	public String getDocumentIdFromUrl(String documentUrl)

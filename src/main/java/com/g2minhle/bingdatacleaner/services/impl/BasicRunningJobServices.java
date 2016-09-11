@@ -18,17 +18,17 @@ public class BasicRunningJobServices implements RunningJobServices {
 	@Autowired
 	DatabaseServices _databaseServices;
 
-	private static BasicRunningJobServices instance = null;
+	private static BasicRunningJobServices _instance = null;
 
 	private BasicRunningJobServices() {
 		// Exists only to defeat instantiation.
 	}
 	
 	public static BasicRunningJobServices getInstance() {
-		if (instance == null) {
-			instance = new BasicRunningJobServices();
+		if (_instance == null) {
+			_instance = new BasicRunningJobServices();
 		}
-		return instance;
+		return _instance;
 	}
 
 	Map<String, BingDataCleanerWorker> _threads =

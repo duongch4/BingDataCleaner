@@ -18,6 +18,7 @@ import com.g2minhle.bingdatacleaner.exception.InvalidDocumentUrlException;
 import com.g2minhle.bingdatacleaner.exception.JobNotFoundException;
 import com.g2minhle.bingdatacleaner.model.Job;
 import com.g2minhle.bingdatacleaner.services.JobServices;
+import com.g2minhle.bingdatacleaner.services.NotificationServices;
 
 @Controller
 @RequestMapping(value = "/jobs")
@@ -25,7 +26,10 @@ public class JobController {
 
 	@Autowired
 	JobServices _jobServices;
-
+	
+	@Autowired
+	NotificationServices _notificationServices;
+	
 	private final static Logger LOGGER = Logger.getLogger(JobController.class.getName());
 
 	@ResponseBody
@@ -46,15 +50,15 @@ public class JobController {
 		} catch (CannotAccessToDocumentException e) {
 			response.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
 		} catch (DatabaseConnectivityException e) {
-			// TODO add warning
+			_notificationServices.warning(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		} catch (DocumentServiceConnectivityException e) {
-			// TODO add warning
+			_notificationServices.warning(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		} catch (InvalidDocumentUrlException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (Exception e) {
-			// TODO add alert to this issue
+			_notificationServices.alert(e.getMessage());
 		}
 		return null;
 	}
@@ -69,10 +73,10 @@ public class JobController {
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {
-			// TODO add warning
+			_notificationServices.warning(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		} catch (Exception e) {
-			// TODO add alert to this issue
+			_notificationServices.alert(e.getMessage());
 		}
 		return null;
 	}
@@ -88,10 +92,10 @@ public class JobController {
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {
-			// TODO add warning
+			_notificationServices.warning(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		} catch (Exception e) {
-			// TODO add alert to this issue
+			_notificationServices.alert(e.getMessage());
 		}
 	}
 
@@ -106,12 +110,12 @@ public class JobController {
 		} catch (JobNotFoundException e) {
 			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		} catch (DatabaseConnectivityException e) {
-			// TODO add warning
+			_notificationServices.warning(e.getMessage());
 			response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		} catch (InvalidActionNameException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		} catch (Exception e) {
-			// TODO add alert to this issue
+			_notificationServices.alert(e.getMessage());
 		}
 	}
 }

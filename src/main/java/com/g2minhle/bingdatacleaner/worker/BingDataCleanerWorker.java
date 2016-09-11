@@ -13,20 +13,24 @@ import com.g2minhle.bingdatacleaner.model.Job.JobStatus;
 import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 import com.g2minhle.bingdatacleaner.services.DocumentServices;
 import com.g2minhle.bingdatacleaner.services.EmailServices;
+import com.g2minhle.bingdatacleaner.services.NotificationServices;
 import com.g2minhle.bingdatacleaner.services.RunningJobServices;
+import com.g2minhle.bingdatacleaner.services.impl.AwsSnsNotificationServices;
 import com.g2minhle.bingdatacleaner.services.impl.DynamoDBServices;
 import com.g2minhle.bingdatacleaner.services.impl.GmailServices;
 import com.g2minhle.bingdatacleaner.services.impl.GoogleSheetServices;
 
 public class BingDataCleanerWorker extends Thread {
 
-	DocumentServices _documentServices = GoogleSheetServices.getInstance();
-
 	DatabaseServices _databaseServices = DynamoDBServices.getInstance();
 
-	RunningJobServices _runningJobServices;
-	
+	DocumentServices _documentServices = GoogleSheetServices.getInstance();
+
 	EmailServices _emailServices = new GmailServices();
+
+	NotificationServices _notificationServices = AwsSnsNotificationServices.getInstance();
+
+	RunningJobServices _runningJobServices;
 
 	Job _job;
 	Boolean _keepRunning;
@@ -46,17 +50,24 @@ public class BingDataCleanerWorker extends Thread {
 	}
 
 	String searchBing(String searchTerm) {
-		try {
-			Document doc =
-					Jsoup.connect("https://www.bing.com/search?q=" + searchTerm)
-							.timeout(10000).ignoreHttpErrors(true)
-							.userAgent("Mozilla/5.0").get();
+		while (true) {
+			try {
+				Document doc =
+						Jsoup.connect("https://www.bing.com/search?q=" + searchTerm)
+								.timeout(10000).ignoreHttpErrors(true)
+								.userAgent("Mozilla/5.0").get();
 
-			Elements resultsLink = doc.select(".b_algo h2 a");
-			String firstUrlBing = resultsLink.get(0).attr("href");
-			return firstUrlBing;
-		} catch (Exception e) {
-			return null;
+				Elements resultsLink = doc.select(".b_algo h2 a");
+				String firstUrlBing = resultsLink.get(0).attr("href");
+				return firstUrlBing;
+			} catch (Exception e) {
+				_notificationServices.warning(e.getMessage());
+				try {
+					sleep(2000L);
+				} catch (InterruptedException interruptedException) {
+					_notificationServices.warning(e.getMessage());
+				}
+			}
 		}
 	}
 
@@ -105,7 +116,7 @@ public class BingDataCleanerWorker extends Thread {
 			_runningJobServices.stopAndRemoveJob(_job.getId());
 			_emailServices.notifyDoneJobDone(_job);
 		} catch (Exception e) {
-
+			_notificationServices.alert(e.getMessage());
 		}
 	}
 }

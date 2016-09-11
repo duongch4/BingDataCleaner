@@ -18,35 +18,34 @@ import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 
 public class DynamoDBServices implements DatabaseServices {
 
-	static ObjectMapper Mapper = new ObjectMapper();
-	static DynamoDB DynamoDBInstance = new DynamoDB(new AmazonDynamoDBClient());
-	static Table Table = DynamoDBInstance.getTable("BingDataCleaner");
+	private static DynamoDBServices _instance = null;
 
-	private static DynamoDBServices instance = null;
+	private static ObjectMapper _mapper = new ObjectMapper();
+	private static DynamoDB _dynamoDBInstance = new DynamoDB(new AmazonDynamoDBClient());
+	private static Table _table = _dynamoDBInstance.getTable("BingDataCleaner");
 
 	private DynamoDBServices() {
 		// Exists only to defeat instantiation.
 	}
 
 	public static DynamoDBServices getInstance() {
-		if (instance == null) {
-			instance = new DynamoDBServices();
+		if (_instance == null) {
+			_instance = new DynamoDBServices();
 		}
-		return instance;
+		return _instance;
 	}
 
 	@Override
 	public Job getJob(String jobId)
 			throws DatabaseConnectivityException, JobNotFoundException {
 		try {
-			// TODO Auto-generated method stub
 			PrimaryKey key = new PrimaryKey();
 			key.addComponent("id", jobId);
-			Item item = Table.getItem(key);
+			Item item = _table.getItem(key);
 			if (item == null) {
 				throw new JobNotFoundException();
 			}
-			return Mapper.readValue(item.toJSON(), Job.class);
+			return _mapper.readValue(item.toJSON(), Job.class);
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());
 		}
@@ -55,8 +54,8 @@ public class DynamoDBServices implements DatabaseServices {
 	@Override
 	public void saveJob(Job newJob) throws DatabaseConnectivityException {
 		try {
-			Item item = Item.fromJSON(Mapper.writeValueAsString(newJob));
-			Table.putItem(item);
+			Item item = Item.fromJSON(_mapper.writeValueAsString(newJob));
+			_table.putItem(item);
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());
 		}
@@ -66,15 +65,15 @@ public class DynamoDBServices implements DatabaseServices {
 	public List<Job> getJobs() throws DatabaseConnectivityException {
 		try {
 			List<Job> jobs = new LinkedList<Job>();
-			ItemCollection<ScanOutcome> scanResults = Table.scan();
+			ItemCollection<ScanOutcome> scanResults = _table.scan();
 			for (Item item : scanResults) {
-				jobs.add(Mapper.readValue(item.toJSON(), Job.class));
+				jobs.add(_mapper.readValue(item.toJSON(), Job.class));
 			}
 			return jobs;
 		} catch (Exception e) {
 			throw new DatabaseConnectivityException(e.getMessage());
 		}
-		
+
 	}
 
 }

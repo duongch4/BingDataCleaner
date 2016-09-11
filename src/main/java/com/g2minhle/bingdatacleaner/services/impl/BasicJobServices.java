@@ -28,17 +28,17 @@ public class BasicJobServices implements JobServices {
 	@Autowired
 	RunningJobServices _runningJobServices;
 	
-	private static BasicJobServices instance = null;
+	private static BasicJobServices _instance = null;
 
 	private BasicJobServices() {
 		// Exists only to defeat instantiation.
 	}
 
 	public static BasicJobServices getInstance() {
-		if (instance == null) {
-			instance = new BasicJobServices();
+		if (_instance == null) {
+			_instance = new BasicJobServices();
 		}
-		return instance;
+		return _instance;
 	}
 
 	@Override
@@ -87,7 +87,6 @@ public class BasicJobServices implements JobServices {
 	public void performAnActionOnJob(String jobId, String action)
 			throws JobNotFoundException, DatabaseConnectivityException,
 			InvalidActionNameException {
-		// TODO Auto-generated method stub
 		Job job = this.getJob(jobId);
 		UserAction userAction;
 		try {

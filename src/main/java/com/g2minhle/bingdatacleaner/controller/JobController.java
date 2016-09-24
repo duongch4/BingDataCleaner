@@ -33,7 +33,7 @@ public class JobController {
 	private final static Logger LOGGER = Logger.getLogger(JobController.class.getName());
 
 	@ResponseBody
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	public Job createJob(
 			String userEmail,
 			String documentUrl,

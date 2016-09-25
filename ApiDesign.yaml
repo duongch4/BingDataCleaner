@@ -1,0 +1,179 @@
+swagger: '2.0'
+info:
+  title: Bing Data Cleaner API
+  description: This is the API design Bing Data Cleaner project, please check <> for more information regarding the project.
+  contact: 
+    name: Hoang Minh Le
+    email: lehoangminh@live.com
+  license:
+    name: All right reserved
+    url: ""
+  version: "1.0.0"
+host: bingdatacleaner.mybluemix.net
+schemes:
+  - http
+basePath: /
+consumes:
+  - application/x-www-form-urlencoded 
+produces:
+  - application/json
+paths:
+  /jobs:
+    post:
+      summary: Create a new job
+      description: |
+        Create a new job given *userEmail* and original *documentURL*.
+        The original document must be shared with [sheetapi@bingdatacleaner.iam.gserviceaccount.com](mailto:sheetapi@bingdatacleaner.iam.gserviceaccount.com)
+        If a new job is created, return the new job json.
+      parameters:
+        - name: userEmail        
+          in: formData
+          description: User email for job status notification.
+          required: true
+          type: string          
+        - name: documentUrl
+          in: formData
+          description: The URL to shared original document.
+          required: true
+          type: string          
+      tags:
+        - Jobs
+      responses:
+        201: 
+          description: Job created and a new job object is returned.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Job'
+        503: 
+          description: If there is an issue connecting to DynamoDB.
+        412: 
+          description: If user did not give permission for the service to access the source document.
+        500: 
+          description: Server Internal Error.          
+  /jobs/{jobId}:
+    get:
+      summary: Get job information given *jobId*
+      description: |
+        Get job information
+      parameters:
+        - name: jobId        
+          in: path
+          description: Job id.
+          required: true
+          type: string                          
+      tags:
+        - Jobs
+      responses:
+        200: 
+          description: Returend job information.
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Job'
+        404: 
+          description: If there is no job with given jobId
+        503: 
+          description: If there is an issue connecting to DynamoDB.
+        500: 
+          description: Server Internal Error.        
+    patch:
+        summary: Update user email for notification.  
+        description: |
+          Change user email for notification when job is done.
+        parameters:
+          - name: jobId        
+            in: path
+            description: Job id.
+            required: true
+            type: string
+          - name: userEmail        
+            in: formData
+            description: User email for job status notification.
+            required: true
+            type: string  
+        tags:
+          - Jobs
+        responses:
+          200: 
+            description: Patch complete.
+          404: 
+            description: If there is no job with given jobId
+          503: 
+            description: If there is an issue connecting to DynamoDB.
+          500: 
+            description: Server Internal Error.
+  /jobs/{jobId}/action:
+    post:
+        summary: Perfrom an action on job given *jobId* and *action*  
+        description: |
+          Perfrom an action on job given job id. 
+          A action can only be either CANCEL, RESTART, PAUSE or RESUME.
+        parameters:
+          - name: jobId        
+            in: path
+            description: Job id.
+            required: true
+            type: string
+          - name: action        
+            in: formData
+            description: The action applied on the job.
+            required: true
+            type: string  
+            enum:
+              - CANCEL
+              - RESTART
+              - PAUSE
+              - RESUME
+        tags:
+          - Jobs
+        responses:
+          200: 
+            description: Action applied on job.
+          404: 
+            description: If there is no job with given jobId
+          503: 
+            description: If there is an issue connecting to DynamoDB.
+          500: 
+            description: Server Internal Error.
+definitions:
+  Job:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Job id.
+      userEmail:
+        type: string
+        description: User email for job done notification.
+      sourceDocumentId:
+        type: string
+        description: sourceDocumentId.      
+      destinationDocumentId:
+        type: string
+        description: destinationDocumentId.
+      status:
+        type: string
+        enum:
+          - CREATED
+          - RUNNING
+          - PAUSED
+          - DONE
+          - CANCELLED
+        description: Job status.      
+      progress:
+        type: integer
+        format: int64  
+        description: Amount of work done.      
+      totalWork:
+        type: integer
+        format: int64
+        description: Total amount of work.      
+      createdTime:
+        type: string
+        format: date
+        description: When the job is created.
+      doneTime:
+        type: string
+        format: date
+        description: When the job is done.

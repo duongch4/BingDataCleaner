@@ -21,10 +21,8 @@ public class GmailServices implements EmailServices {
 		String documentUrl = String.format(
 				"https://docs.google.com/spreadsheets/d/%s", 
 				job.getDestinationDocumentId());
-		String notificationScriptUrl = String.format(
-				_notificationScriptUrl, 
-				job.getUserEmail(), 
-				documentUrl);
+		String notificationScriptUrl = _notificationScriptUrl.replace("{email}", job.getUserEmail());
+		notificationScriptUrl = notificationScriptUrl.replace("{doc}", documentUrl);
 		Jsoup.connect(notificationScriptUrl)
 			 .timeout(10000)
 			 .ignoreHttpErrors(true)

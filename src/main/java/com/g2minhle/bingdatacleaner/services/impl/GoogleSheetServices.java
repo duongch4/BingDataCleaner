@@ -117,7 +117,7 @@ public class GoogleSheetServices implements DocumentServices {
 			throws CannotAccessToDocumentException, DocumentServiceConnectivityException {
 		try {
 			Document doc =
-					Jsoup.connect(String.format(_docSizeScriptUrl, sourceDocumentId))
+					Jsoup.connect(_docSizeScriptUrl.replace("{sheetId}", sourceDocumentId))
 							.timeout(10000).ignoreHttpErrors(true)
 							.userAgent("Mozilla/5.0").get();
 			return Long.parseLong(doc.select("body").html().toString());

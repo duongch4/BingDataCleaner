@@ -7,15 +7,22 @@ import com.amazonaws.services.sns.model.PublishRequest;
 
 public class AwsSnsNotificationServices implements NotificationServices {
 
+	private static final String ALERT_ARN_ENV_VAR = "ALERT_ARN"; 
+	
+	private static final String WARNING_ARN_ENV_VAR = "WARNING_ARN";
+	
 	private static AwsSnsNotificationServices Instance = null;
 
-	private static final String ALERT_ARN =
-			"arn:aws:sns:us-east-1:062478782561:BingDataCleanerIssues";
+	private static final String _alertArn;
 
-	private static final String WARNING_ARN =
-			"arn:aws:sns:us-east-1:062478782561:BingDataCleanerWarning";
+	private static final String _warningArn;
+	
+	static {
+		_alertArn = System.getenv(ALERT_ARN_ENV_VAR);
+		_warningArn = System.getenv(WARNING_ARN_ENV_VAR);
+	}
 
-	// create a new SNS client and set endpoint
+	// create a new SNS client and set end point
 	private AmazonSNSClient snsClient = new AmazonSNSClient();
 
 	private AwsSnsNotificationServices() {
@@ -30,12 +37,12 @@ public class AwsSnsNotificationServices implements NotificationServices {
 	}
 
 	public void alert(String message) {
-		PublishRequest publishRequest = new PublishRequest(ALERT_ARN, message);
+		PublishRequest publishRequest = new PublishRequest(_alertArn, message);
 		snsClient.publish(publishRequest);
 	}
 
 	public void warning(String message) {
-		PublishRequest publishRequest = new PublishRequest(WARNING_ARN, message);
+		PublishRequest publishRequest = new PublishRequest(_warningArn, message);
 		snsClient.publish(publishRequest);
 	}
 }

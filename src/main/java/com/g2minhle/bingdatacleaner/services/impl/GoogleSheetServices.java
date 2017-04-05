@@ -42,6 +42,10 @@ import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 
 public class GoogleSheetServices implements DocumentServices {
 
+	private static final String GOOGLE_CLIENT_SECRET_ENV_VAR = "GOOGLE_CLIENT_SECRET";
+	private static final String PARENT_FOLDER_ID_ENV_VAR = "PARENT_FOLDER_ID";
+	private static final String DOC_SIZE_SCRIPT_URL_ENV_VAR = "DOC_SIZE_SCRIPT";
+	
 	@Autowired
 	NotificationServices _notificationServices;
 	
@@ -50,7 +54,9 @@ public class GoogleSheetServices implements DocumentServices {
 	private static Drive _driveServices = null;
 	private static Sheets _sheetServices = null;
 	private static List<String> _googleAPIScopes = new ArrayList<String>();
-	private static final String PARENT_FOLDER_ID = "0B65PxeIkFoQIZTFaMGRqX1JkUGs";
+	private static String _parentFolderId;
+	private static String _docSizeScriptUrl;
+	
 	static {
 		_googleAPIScopes.addAll(SheetsScopes.all());
 		_googleAPIScopes.addAll(DriveScopes.all());
@@ -83,7 +89,10 @@ public class GoogleSheetServices implements DocumentServices {
 			_notificationServices.alert(e.getMessage());
 			return;
 		}
-		String clientSecret = System.getenv("GOOGLE_CLIENT_SECRET");
+		String clientSecret = System.getenv(GOOGLE_CLIENT_SECRET_ENV_VAR);
+		_parentFolderId = System.getenv(PARENT_FOLDER_ID_ENV_VAR);
+		_docSizeScriptUrl = System.getenv(DOC_SIZE_SCRIPT_URL_ENV_VAR);
+		
 		InputStream in = new ByteArrayInputStream(clientSecret.getBytes());
 		GoogleCredential credential;
 		try {
@@ -108,9 +117,7 @@ public class GoogleSheetServices implements DocumentServices {
 			throws CannotAccessToDocumentException, DocumentServiceConnectivityException {
 		try {
 			Document doc =
-					Jsoup.connect(
-							"https://script.google.com/macros/s/AKfycbzhROusom6nLSsoAjj4tH9HBrTlEk0lDZSLEF2qi7uHBXJaS2w/exec?sheetId="
-									+ sourceDocumentId)
+					Jsoup.connect(String.format(_docSizeScriptUrl, sourceDocumentId))
 							.timeout(10000).ignoreHttpErrors(true)
 							.userAgent("Mozilla/5.0").get();
 			return Long.parseLong(doc.select("body").html().toString());
@@ -125,7 +132,7 @@ public class GoogleSheetServices implements DocumentServices {
 			throws DocumentServiceConnectivityException {
 		File newSheet = new File();
 		newSheet.setMimeType("application/vnd.google-apps.spreadsheet");
-		newSheet.setParents(Arrays.asList(PARENT_FOLDER_ID));
+		newSheet.setParents(Arrays.asList(_parentFolderId));
 		newSheet.setName("temp");
 		Permission userPermission =
 				new Permission().setType("user").setRole("writer")

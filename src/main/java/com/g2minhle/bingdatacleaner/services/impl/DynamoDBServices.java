@@ -18,11 +18,18 @@ import com.g2minhle.bingdatacleaner.services.DatabaseServices;
 
 public class DynamoDBServices implements DatabaseServices {
 
+	private static final String DYNAMO_DB_TABLE_ENV_VAR = "DYNAMO_DB_TABLE";
+	
 	private static DynamoDBServices _instance = null;
 
-	private static ObjectMapper _mapper = new ObjectMapper();
-	private static DynamoDB _dynamoDBInstance = new DynamoDB(new AmazonDynamoDBClient());
-	private static Table _table = _dynamoDBInstance.getTable("BingDataCleaner");
+	private static ObjectMapper _mapper;
+	private static DynamoDB _dynamoDBInstance;
+	private static Table _table;
+	static {
+		_mapper = new ObjectMapper();
+		_dynamoDBInstance = new DynamoDB(new AmazonDynamoDBClient());
+		_table = _dynamoDBInstance.getTable(System.getenv(DYNAMO_DB_TABLE_ENV_VAR));
+	}
 
 	private DynamoDBServices() {
 		// Exists only to defeat instantiation.

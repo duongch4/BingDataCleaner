@@ -1,4 +1,4 @@
-package com.g2minhle.bingdatacleaner.controller.configs;
+package com.g2minhle.bingdatacleaner.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
